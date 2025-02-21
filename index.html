@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>حاسبة مكافأة نهاية الخدمة</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body { background-color: #f8f9fa; direction: rtl; text-align: right; }
+        .container { max-width: 500px; margin-top: 50px; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 15px rgba(0, 0, 0, 0.1); }
+        .btn-primary { background: linear-gradient(45deg, #007bff, #0056b3); border: none; }
+        .form-control { border-radius: 10px; }
+        .card { box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); border-radius: 15px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card p-4">
+            <h2 class="text-center text-primary">حاسبة عبدالمعز مكافأة نهاية الخدمة</h2>
+            <form id="calculator-form">
+                <div class="mb-3">
+                    <label class="form-label">الراتب الشهري (ريال)</label>
+                    <input type="number" id="salary" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">عدد سنوات الخدمة</label>
+                    <input type="number" id="years" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">نوع العقد</label>
+                    <select id="contractType" class="form-control">
+                        <option value="غير محدد المدة">غير محدد المدة</option>
+                        <option value="محدد المدة">محدد المدة</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">سبب إنهاء الخدمة</label>
+                    <select id="terminationReason" class="form-control">
+                        <option value="فصل من العمل">فصل من العمل</option>
+                        <option value="استقالة">استقالة</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">احسب المكافأة</button>
+            </form>
+            <h3 class="text-center mt-4 text-success" id="result"></h3>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            if (localStorage.getItem("salary")) {
+                $("#salary").val(localStorage.getItem("salary"));
+                $("#years").val(localStorage.getItem("years"));
+                $("#contractType").val(localStorage.getItem("contractType"));
+                $("#terminationReason").val(localStorage.getItem("terminationReason"));
+            }
+            
+            $("#calculator-form").submit(function(e) {
+                e.preventDefault();
+                let salary = parseFloat($("#salary").val());
+                let years = parseFloat($("#years").val());
+                let contractType = $("#contractType").val();
+                let terminationReason = $("#terminationReason").val();
+                let bonus = 0;
+                
+                if (terminationReason === "استقالة") {
+                    if (years < 2) {
+                        bonus = 0;
+                    } else if (years >= 2 && years < 5) {
+                        bonus = (salary * 0.5 * years) / 3;
+                    } else if (years >= 5 && years < 10) {
+                        bonus = (salary * 0.5 * 5 + salary * (years - 5)) * (2/3);
+                    } else {
+                        bonus = (salary * 0.5 * 5) + (salary * (years - 5));
+                    }
+                } else {
+                    if (years < 2) {
+                        bonus = 0;
+                    } else if (years >= 2 && years <= 5) {
+                        bonus = salary * 0.5 * years;
+                    } else {
+                        bonus = (salary * 0.5 * 5) + (salary * (years - 5));
+                    }
+                }
+                
+                localStorage.setItem("salary", salary);
+                localStorage.setItem("years", years);
+                localStorage.setItem("contractType", contractType);
+                localStorage.setItem("terminationReason", terminationReason);
+                
+                $("#result").html(`مكافأة نهاية الخدمة: <strong>${bonus.toFixed(2)} ريال</strong>`);
+            });
+        });
+    </script>
+</body>
+</html>
